@@ -1,0 +1,31 @@
+version: "3"
+services:
+  openldap:
+    image: mcreations/fusiondirectory-ldap
+    environment:
+      - LDAP_DOMAIN=${LDAP_DOMAIN}
+      - LDAP_ROOTPW=${LDAP_ROOTPW}
+    networks:
+      - default
+      - office
+  fusiondirectory:
+    image: mcreations/fusiondirectory
+    environment:
+      - LDAP_DOMAIN=${LDAP_DOMAIN}
+      - LDAP_ROOTPW=${LDAP_ROOTPW}
+      - LDAP_ROOTDN=${LDAP_ROOTDN}
+      - LDAP_SERVER_URL=ldap://openldap:389
+    ports:
+      - ${FUSIONDIRECTORY_PORT}:80
+    networks:
+      - default
+    depends_on:
+      - openldap
+    links:
+      - openldap
+volumes:
+  openldap-data:
+networks:
+  default:
+  office:
+    external: true
